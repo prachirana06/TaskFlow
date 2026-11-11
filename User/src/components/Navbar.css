@@ -1,0 +1,585 @@
+
+/* ===== TaskFlow Professional Navbar ===== */
+
+.taskflow-navbar {
+  width: 100%;
+  min-height: 94px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 22px;
+  padding: 18px 30px;
+  background: #ffffff;
+  border-bottom: 1px solid #e6ebe3;
+  color: #202b40;
+  font-family: "Inter", "Segoe UI", sans-serif;
+  position: relative;
+  z-index: 20;
+  transition: background 0.25s ease, color 0.25s ease,
+    border-color 0.25s ease;
+}
+
+/* ===== Left Section ===== */
+
+.navbar-start {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-shrink: 0;
+}
+
+.navbar-page h2 {
+  margin: 5px 0 0;
+  font-size: 22px;
+  font-weight: 750;
+  color: #202b40;
+  transition: color 0.25s ease;
+}
+
+.navbar-breadcrumb {
+  color: #8a958f;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.navbar-breadcrumb span {
+  padding: 0 5px;
+  color: #27845f;
+}
+
+/* ===== Search Bar ===== */
+
+.navbar-search-wrap {
+  height: 43px;
+  max-width: 340px;
+  min-width: 150px;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 12px;
+  border: 1px solid #e1e9e1;
+  border-radius: 12px;
+  background: #f7f8f0;
+  transition: all 0.25s ease;
+}
+
+.navbar-search-wrap:focus-within {
+  border-color: #27845f;
+  box-shadow: 0 0 0 3px rgba(39, 132, 95, 0.1);
+}
+
+.search-symbol {
+  font-size: 23px;
+  color: #718078;
+  line-height: 1;
+}
+
+.navbar-search-wrap input {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  outline: none;
+  border: none;
+  background: transparent;
+  color: #202b40;
+  font-size: 12px;
+  font-family: inherit;
+}
+
+.navbar-search-wrap input::placeholder {
+  color: #96a099;
+}
+
+.navbar-search-wrap kbd {
+  padding: 4px 6px;
+  border: 1px solid #dce5dc;
+  border-radius: 5px;
+  background: #ffffff;
+  color: #7c897f;
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+/* ===== Right Section ===== */
+
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: nowrap;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.navbar-icon-btn {
+  width: 39px;
+  height: 39px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  border: 1px solid #e5ebe4;
+  border-radius: 11px;
+  background: #ffffff;
+  color: #34483e;
+  font-size: 19px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.navbar-icon-btn:hover {
+  background: #eaf5ee;
+  border-color: #b8dfc8;
+  color: #27845f;
+}
+
+.navbar-popup-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* ===== Focus Mode ===== */
+
+.focus-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 12px;
+  border: 1px solid #dcece0;
+  border-radius: 10px;
+  background: #f0f8f1;
+  color: #397052;
+  font-size: 11px;
+  font-weight: 650;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.focus-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #2ba66a;
+}
+
+.focus-active {
+  background: #d9f5e4;
+  border-color: #8fd2a8;
+}
+
+/* ===== Theme Toggle ===== */
+
+.theme-toggle {
+  position: static !important;
+  align-self: center;
+  transform: none !important;
+  margin: 0 !important;
+  top: auto !important;
+}
+
+.theme-toggle:hover {
+  transform: translateY(-2px) !important;
+}
+
+/* ===== Notification Indicator ===== */
+
+.notification-dot {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  top: 7px;
+  right: 7px;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  background: #e45c5c;
+}
+
+/* ===== Profile Button ===== */
+
+.navbar-profile-btn {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 3px 2px;
+  border: none;
+  background: transparent;
+  color: #202b40;
+  cursor: pointer;
+  transition: color 0.25s ease;
+}
+
+.navbar-avatar {
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #d7f5e5, #8fdbb3);
+  color: #174b37;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.navbar-user-name {
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.profile-chevron {
+  color: #8a958f;
+  font-size: 17px;
+}
+
+/* ===== New Task Button ===== */
+
+.navbar-new-task {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 41px;
+  padding: 0 15px;
+  border: none;
+  border-radius: 11px;
+  background: #dca744;
+  color: #202b40;
+  font-size: 12px;
+  font-weight: 750;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(220, 167, 68, 0.15);
+  transition: all 0.2s ease;
+}
+
+.navbar-new-task:hover {
+  background: #edbd5b;
+  transform: translateY(-1px);
+}
+
+.navbar-new-task span {
+  font-size: 18px;
+}
+
+/* ===== Dropdowns ===== */
+
+.navbar-dropdown {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  width: 245px;
+  padding: 15px;
+  border: 1px solid #e5ebe4;
+  border-radius: 14px;
+  background: #ffffff;
+  color: #202b40;
+  box-shadow: 0 12px 35px rgba(32, 43, 64, 0.14);
+  z-index: 100;
+  transition: background 0.25s ease, color 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.navbar-dropdown h4 {
+  margin: 0 0 12px;
+  font-size: 15px;
+}
+
+.notification-dropdown p {
+  margin: 0 0 6px;
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.notification-dropdown > span {
+  color: #7c897f;
+  font-size: 11px;
+}
+
+.dropdown-user {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 5px 5px 13px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid #edf0ea;
+}
+
+.dropdown-user strong {
+  font-size: 14px;
+}
+
+.dropdown-user span {
+  color: #849087;
+  font-size: 11px;
+}
+
+.navbar-dropdown > button {
+  width: 100%;
+  padding: 11px 8px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #405448;
+  text-align: left;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.navbar-dropdown > button:hover {
+  background: #f0f7f0;
+}
+
+.navbar-dropdown > .dropdown-logout {
+  color: #c44949;
+}
+
+/* =================================
+   DARK MODE
+================================= */
+
+.taskflow-navbar.navbar-dark {
+  background: #182638;
+  border-color: #34445a;
+  color: #edf4f0;
+}
+
+.navbar-dark .navbar-page h2,
+.navbar-dark .navbar-profile-btn {
+  color: #edf4f0;
+}
+
+.navbar-dark .navbar-breadcrumb {
+  color: #9eafa9;
+}
+
+.navbar-dark .navbar-breadcrumb span {
+  color: #65c596;
+}
+
+/* Dark Search */
+
+.navbar-dark .navbar-search-wrap {
+  background: #243449;
+  border-color: #40516a;
+}
+
+.navbar-dark .navbar-search-wrap:focus-within {
+  border-color: #65c596;
+  box-shadow: 0 0 0 3px rgba(101, 197, 150, 0.12);
+}
+
+.navbar-dark .search-symbol {
+  color: #a8bbb2;
+}
+
+.navbar-dark .navbar-search-wrap input {
+  color: #f0f5f2;
+}
+
+.navbar-dark .navbar-search-wrap input::placeholder {
+  color: #9aabb0;
+}
+
+.navbar-dark .navbar-search-wrap kbd {
+  background: #182638;
+  border-color: #40516a;
+  color: #b5c2c5;
+}
+
+/* Dark Buttons */
+
+.navbar-dark .navbar-icon-btn {
+  background: #243449;
+  border-color: #40516a;
+  color: #e5eee9;
+}
+
+.navbar-dark .navbar-icon-btn:hover {
+  background: #30465b;
+  border-color: #65c596;
+  color: #83dbad;
+}
+
+.navbar-dark .notification-dot {
+  border-color: #243449;
+}
+
+/* Dark Focus Mode */
+
+.navbar-dark .focus-badge {
+  background: #263f3b;
+  border-color: #3b6256;
+  color: #a9e2c3;
+}
+
+.navbar-dark .focus-active {
+  background: #315b4b;
+  border-color: #65a982;
+  color: #d7f5e5;
+}
+
+/* Dark Profile */
+
+.navbar-dark .navbar-avatar {
+  background: linear-gradient(135deg, #326b55, #65b98b);
+  color: #ffffff;
+}
+
+.navbar-dark .profile-chevron {
+  color: #a8b7b1;
+}
+
+/* Dark Dropdown */
+
+.navbar-dark .navbar-dropdown {
+  background: #243449;
+  border-color: #40516a;
+  color: #edf4f0;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
+}
+
+.navbar-dark .notification-dropdown > span,
+.navbar-dark .dropdown-user span {
+  color: #a7b7b2;
+}
+
+.navbar-dark .dropdown-user {
+  border-color: #40516a;
+}
+
+.navbar-dark .navbar-dropdown > button {
+  color: #dce9e2;
+}
+
+.navbar-dark .navbar-dropdown > button:hover {
+  background: #30465b;
+}
+
+.navbar-dark .navbar-dropdown > .dropdown-logout {
+  color: #ff9999;
+}
+
+/* Dark New Task Button */
+
+.navbar-dark .navbar-new-task {
+  background: #dca744;
+  color: #202b40;
+}
+
+/* ===== Responsive ===== */
+
+@media (max-width: 1200px) {
+  .taskflow-navbar {
+    gap: 12px;
+    padding: 16px 20px;
+  }
+
+  .navbar-actions {
+    gap: 8px;
+  }
+
+  .focus-badge {
+    padding: 9px;
+  }
+}
+
+@media (max-width: 950px) {
+  .navbar-search-wrap {
+    max-width: 240px;
+  }
+
+  .focus-badge {
+    font-size: 0;
+    gap: 0;
+    width: 36px;
+    height: 36px;
+    justify-content: center;
+    padding: 0;
+  }
+
+  .focus-dot {
+    width: 8px;
+    height: 8px;
+  }
+
+  .navbar-user-name,
+  .profile-chevron {
+    display: none;
+  }
+}
+
+@media (max-width: 650px) {
+  .taskflow-navbar {
+    flex-wrap: wrap;
+    padding: 14px;
+  }
+
+  .navbar-start {
+    flex: 1;
+  }
+
+  .navbar-page h2 {
+    font-size: 18px;
+  }
+
+  .navbar-search-wrap {
+    order: 3;
+    flex: 1 1 100%;
+    max-width: none;
+  }
+
+  .navbar-actions {
+    gap: 6px;
+  }
+
+  .navbar-icon-btn {
+    width: 35px;
+    height: 35px;
+  }
+
+  .theme-toggle {
+    display: inline-flex !important;
+  }
+
+  .navbar-dropdown {
+    width: 220px;
+  }
+}
+
+@media (max-width: 380px) {
+  .taskflow-navbar {
+    padding: 12px 10px;
+  }
+
+  .navbar-start {
+    gap: 8px;
+  }
+
+  .navbar-actions {
+    gap: 4px;
+  }
+
+  .navbar-page h2 {
+    font-size: 16px;
+  }
+
+  .navbar-breadcrumb {
+    font-size: 10px;
+  }
+
+  .navbar-icon-btn {
+    width: 32px;
+    height: 32px;
+  }
+}

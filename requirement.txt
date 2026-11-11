@@ -1,0 +1,64 @@
+for frontend :-
+1. sbse phle frontend file bnayege (User)...USING REACT
+2.OPEN TERMINAL
+3.npm create vite@latest
+4.project name:-USER(frontend folder name)
+5.select:-REACT
+6.select:-js
+7.select:-exslit
+8. select:-yes
+then folder in process
+
+************************************************
+command to run frontend :-{npm run dev}
+************************************************
+
+9. delete altu faltu files...except - main.jsx,app.jsx
+10. src k andr :-
+   components , pages , style.css , app.jsx, main.jsx
+
+11.components k andr :- sidebar.jsx ,navbar.jsx
+then
+12. pages folder me:-- login,register,dashboard.jsx 
+then 
+13. main.jsx me app.jsx or style.css import krayege
+14. fir code likhege...............
+15. CRUD OPERATION b add krege....
+
+hogyaaaaaaaaaaaaaaaaaa frontend.....
+
+#############    BACKEND    #####################
+
+1. ab task manager me backend k liyee folder bnegaa named (SERVER)....
+2.open TERMINAL
+3.backend initailized command (start krne k liyee):-
+    npm init -y
+
+4.express or cors install krege:-
+    npm install express cores
+    express:- for Backend/API bnane k liyee
+    CORS:-help to communicate between backend & frontend
+
+5.create a file in server folder named server.js
+6. write code for backend....
+
+*****************************************
+COMMAND TO RUN BACKEND:- npm run dev (nodemon install kraa thaa)
+*****************************************
+
+################### SQLITE DATABASE ######################
+
+1.OPEN TERMINAL OF BACKEND (Server vala)
+2. install SQLITE
+ COMMAND :- npm install better-sqlite3
+3. create file named database.js
+4. database file ko import krege server.js file main
+     const db = require("./database");
+5. if database connected successfully then taskmanager.db file create automaticallyyyy......
+
+
+
+
+
+#######################################################
+otp k liyeee  :- nodemailer installkrnaa h 
