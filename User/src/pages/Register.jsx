@@ -48,7 +48,7 @@ function Register() {
             setLoading(true);
 
             const response = await axios.post(
-                "http://localhost:5000/register/send-otp",
+                "https://taskflow-backend-opjd.onrender.com/register/send-otp",
                 {
                     name: name.trim(),
                     email: email.trim(),
@@ -86,7 +86,7 @@ function Register() {
             setLoading(true);
 
             const response = await axios.post(
-                "http://localhost:5000/register/verify-otp",
+                "https://taskflow-backend-opjd.onrender.com/register/verify-otp",
                 {
                     email: email.trim(),
                     otp: otp.trim()
@@ -124,7 +124,7 @@ function Register() {
             setLoading(true);
 
             const response = await axios.post(
-                "http://localhost:5000/register/send-otp",
+                "https://taskflow-backend-opjd.onrender.com/register/send-otp",
                 {
                     name: name.trim(),
                     email: email.trim(),

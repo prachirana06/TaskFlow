@@ -1,7 +1,9 @@
-
+const path = require("path");
 const Database = require("better-sqlite3");
 
-const db = new Database("taskmanager.db");
+const dbPath = process.env.DB_PATH || path.join(__dirname, "taskmanager.db");
+const db = new Database(dbPath);
+
 
 db.pragma("foreign_keys = ON");
 

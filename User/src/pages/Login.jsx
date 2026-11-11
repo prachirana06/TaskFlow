@@ -34,7 +34,7 @@ function Login() {
       setLoading(true);
 
       const response = await axios.post(
-        "http://localhost:5000/login",
+        "https://taskflow-backend-opjd.onrender.com/login",
         {
           email: email.trim(),
           password,
@@ -87,7 +87,7 @@ function Login() {
       setLoading(true);
 
       const response = await axios.post(
-        "http://localhost:5000/forgot-password/send-otp",
+        "https://taskflow-backend-opjd.onrender.com/forgot-password/send-otp",
         { email: email.trim() }
       );
 
@@ -127,7 +127,7 @@ function Login() {
       setLoading(true);
 
       const response = await axios.post(
-        "http://localhost:5000/forgot-password/reset",
+        "https://taskflow-backend-opjd.onrender.com/forgot-password/reset",
         {
           email: email.trim(),
           otp: otp.trim(),

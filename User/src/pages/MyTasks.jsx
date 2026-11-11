@@ -27,7 +27,7 @@ function MyTasks({ darkMode, setDarkMode }) {
         localStorage.getItem("token") ||
         sessionStorage.getItem("token");
 
-    const API = "http://localhost:5000/tasks";
+    const API = "https://taskflow-backend-opjd.onrender.com/tasks";
 
     useEffect(() => {
         getTasks();

@@ -19,7 +19,7 @@ function Calendar({ darkMode, setDarkMode }) {
 
     const getTasks = async () => {
         try {
-            const res = await axios.get("http://localhost:5000/tasks", {
+            const res = await axios.get("https://taskflow-backend-opjd.onrender.com/tasks", {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
