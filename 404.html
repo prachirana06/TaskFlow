@@ -1,1 +1,15 @@
-<!doctype html><html><head><meta charset="utf-8"><title>TaskFlow</title><script>location.replace("/TaskFlow/?route="+encodeURIComponent(location.pathname+location.search+location.hash));</script></head><body></body></html>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>TaskFlow</title>
+    <script>
+      sessionStorage.setItem(
+        "taskflow_redirect",
+        location.pathname + location.search + location.hash
+      );
+      location.replace("/TaskFlow/");
+    </script>
+  </head>
+  <body></body>
+</html>

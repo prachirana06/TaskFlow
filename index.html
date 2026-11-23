@@ -5,10 +5,19 @@
     <link rel="icon" type="image/svg+xml" href="/TaskFlow/favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>TaskFlow</title>
-    <script type="module" crossorigin src="/TaskFlow/assets/index-BZ15nIM2.js"></script>
+    <script>
+      (function () {
+        var target = sessionStorage.getItem("taskflow_redirect");
+        if (target) {
+          sessionStorage.removeItem("taskflow_redirect");
+          history.replaceState(null, "", target);
+        }
+      })();
+    </script>
+    <script type="module" crossorigin src="/TaskFlow/assets/index-A2uyyb3K.js"></script>
     <link rel="stylesheet" crossorigin href="/TaskFlow/assets/index-BThSU8z8.css">
   </head>
   <body>
-    <script>(function(){var m=location.search.match(/[?&]route=([^&]+)/);if(m){history.replaceState(null,"",decodeURIComponent(m[1]));}})();</script><div id="root"></div>
+    <div id="root"></div>
   </body>
 </html>
