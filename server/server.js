@@ -887,6 +887,6 @@ connectDatabase()
     })
     .catch((error) => {
         console.error("MongoDB connection failed:", error.message);
-        console.error("Set MONGO_URI in server/.env (e.g. mongodb://127.0.0.1:27017/taskflow)");
+        console.error("Please check MONGO_URI in Render Environment Variables.");
         process.exit(1);
     });
