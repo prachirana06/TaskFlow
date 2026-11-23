@@ -84,18 +84,20 @@ function Sidebar({ darkMode = false }) {
 
     const getUser = () => {
         try {
-            return JSON.parse(
+            const stored = JSON.parse(
                 localStorage.getItem("user") ||
                 sessionStorage.getItem("user") ||
                 "{}"
             );
+            return stored && typeof stored === "object" ? stored : {};
         } catch {
             return {};
         }
     };
 
     const user = getUser();
-    const userName = user.name || user.username || "My Account";
+    const userName = String(user.name || user.username || "My Account");
+    const userAvatar = typeof user.avatar === "string" ? user.avatar : "";
 
     const isActive = (path) => location.pathname === path;
 
@@ -197,7 +199,11 @@ function Sidebar({ darkMode = false }) {
                 <div className="sidebar-bottom">
                     <div className="sidebar-profile">
                         <div className="profile-avatar">
-                            {userName.charAt(0).toUpperCase()}
+                            {userAvatar ? (
+                                <img src={userAvatar} alt="Profile" />
+                            ) : (
+                                String(userName || "M").charAt(0).toUpperCase()
+                            )}
                         </div>
 
                         <div className="profile-info">

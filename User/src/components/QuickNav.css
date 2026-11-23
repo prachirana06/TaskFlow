@@ -1,0 +1,139 @@
+.quicknav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 0 0 24px;
+}
+
+.quicknav-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    padding: 9px 14px 9px 9px;
+    border: 1px solid transparent;
+    border-radius: 15px;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: transform 0.18s ease, box-shadow 0.18s ease,
+        background-color 0.18s ease;
+    box-shadow: 0 3px 12px rgba(16, 71, 52, 0.06);
+}
+
+.quicknav-link:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(16, 71, 52, 0.14);
+}
+
+.quicknav-link:focus-visible {
+    outline: 2px solid #187653;
+    outline-offset: 2px;
+}
+
+.quicknav-icon {
+    display: grid;
+    place-items: center;
+    width: 27px;
+    height: 27px;
+    flex: 0 0 27px;
+    border-radius: 9px;
+    background: rgba(255, 255, 255, 0.75);
+    font-size: 0.95rem;
+    line-height: 1;
+}
+
+.quicknav-active {
+    border-color: currentColor;
+    box-shadow: 0 6px 16px rgba(16, 71, 52, 0.16);
+}
+
+.quicknav-green {
+    background: #e4f4e9;
+    color: #155e43;
+}
+
+.quicknav-blue {
+    background: #e5f0fb;
+    color: #1c4a75;
+}
+
+.quicknav-orange {
+    background: #fff0df;
+    color: #8a4a12;
+}
+
+.quicknav-purple {
+    background: #f0eafa;
+    color: #5b3d86;
+}
+
+.quicknav-pink {
+    background: #fbeaf1;
+    color: #8b3159;
+}
+
+.quicknav-slate {
+    background: #eceff4;
+    color: #33445c;
+}
+
+.quicknav-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 12px;
+    border-radius: 999px;
+    background: rgba(24, 118, 83, 0.1);
+    color: #187653;
+    font-family: inherit;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background-color 0.18s ease, transform 0.18s ease;
+}
+
+.quicknav-cta:hover {
+    background: rgba(24, 118, 83, 0.2);
+    transform: translateX(2px);
+}
+
+.quicknav-cta:focus-visible {
+    outline: 2px solid #187653;
+    outline-offset: 2px;
+}
+
+.dark-mode .quicknav-link {
+    background: #263347;
+    color: #e2f3e8;
+}
+
+.dark-mode .quicknav-icon {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.dark-mode .quicknav-active {
+    border-color: #55d49b;
+}
+
+.dark-mode .quicknav-cta {
+    background: rgba(85, 212, 155, 0.14);
+    color: #9be0bb;
+}
+
+@media (max-width: 700px) {
+    .quicknav {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        padding-bottom: 6px;
+        scrollbar-width: none;
+    }
+
+    .quicknav::-webkit-scrollbar {
+        display: none;
+    }
+
+    .quicknav-link {
+        flex: 0 0 auto;
+    }
+}

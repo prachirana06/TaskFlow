@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../api";
 import "./Login.css";
 
 function Login() {
@@ -33,8 +33,8 @@ function Login() {
     try {
       setLoading(true);
 
-      const response = await axios.post(
-        "https://taskflow-backend-opjd.onrender.com/login",
+      const response = await api.post(
+        "/login",
         {
           email: email.trim(),
           password,
@@ -86,8 +86,8 @@ function Login() {
     try {
       setLoading(true);
 
-      const response = await axios.post(
-        "https://taskflow-backend-opjd.onrender.com/forgot-password/send-otp",
+      const response = await api.post(
+        "/forgot-password/send-otp",
         { email: email.trim() }
       );
 
@@ -126,8 +126,8 @@ function Login() {
     try {
       setLoading(true);
 
-      const response = await axios.post(
-        "https://taskflow-backend-opjd.onrender.com/forgot-password/reset",
+      const response = await api.post(
+        "/forgot-password/reset",
         {
           email: email.trim(),
           otp: otp.trim(),

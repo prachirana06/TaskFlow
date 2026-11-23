@@ -46,15 +46,21 @@ hogyaaaaaaaaaaaaaaaaaa frontend.....
 COMMAND TO RUN BACKEND:- npm run dev (nodemon install kraa thaa)
 *****************************************
 
-################### SQLITE DATABASE ######################
+################### MONGODB DATABASE (MERN) ######################
 
-1.OPEN TERMINAL OF BACKEND (Server vala)
-2. install SQLITE
- COMMAND :- npm install better-sqlite3
-3. create file named database.js
-4. database file ko import krege server.js file main
-     const db = require("./database");
-5. if database connected successfully then taskmanager.db file create automaticallyyyy......
+1. MongoDB locally install karein ya MongoDB Atlas cluster banayein.
+2. server/.env.example ko copy karke server/.env banayein aur MONGO_URI set karein:
+     MONGO_URI=mongodb://127.0.0.1:27017/taskflow
+   (Atlas URI bhi yahin paste kar sakte hain)
+3. Server chalate hi database connect ho jayega; tables manually banane ki zarurat nahi.
+4. Mongoose models: server/models/User.js, Task.js, EmailOtp.js
+5. Frontend ke liye User/.env.example copy karke User/.env banayein:
+     VITE_API_URL=http://localhost:5000
+   (Deployed backend ka URL bhi yahin de sakte hain)
+
+COMMANDS:
+  backend : cd server && npm install && npm run dev
+  frontend: cd User && npm install && npm run dev
 
 
 

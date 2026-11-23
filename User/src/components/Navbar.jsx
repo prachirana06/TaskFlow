@@ -1,24 +1,58 @@
 
 import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { useSidebar } from "../SidebarContext";
+import api from "../api";
 import "./Navbar.css";
+
+function localDateString(date = new Date()) {
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+}
+
+function formatReminderDate(value) {
+    const date = new Date(`${value}T12:00:00`);
+
+    if (Number.isNaN(date.getTime())) return value;
+
+    return date.toLocaleDateString("en-US", {
+        day: "numeric",
+        month: "short",
+    });
+}
+
+function readReminders() {
+    try {
+        const stored = JSON.parse(
+            localStorage.getItem("taskflow_reminders") || "[]"
+        );
+        return Array.isArray(stored) ? stored : [];
+    } catch {
+        return [];
+    }
+}
 
 function Navbar({
     onToggleSidebar,
-    onNewTask,
     onSearch,
     darkMode = false,
     setDarkMode,
     pageTitle = "Dashboard",
 }) {
     const { toggleSidebar } = useSidebar();
+    const navigate = useNavigate();
 
     const [search, setSearch] = useState("");
     const [focusMode, setFocusMode] = useState(false);
     const [showNotifications, setShowNotifications] = useState(false);
     const [showProfile, setShowProfile] = useState(false);
+    const [tasks, setTasks] = useState([]);
+    const [reminders, setReminders] = useState(readReminders);
+    const [showReminderForm, setShowReminderForm] = useState(false);
+    const [reminderTitle, setReminderTitle] = useState("");
+    const [reminderDate, setReminderDate] = useState(() => localDateString());
 
     let userName = "Username";
+    let userAvatar = "";
 
     try {
         const storedUser =
@@ -27,7 +61,8 @@ function Navbar({
 
         if (storedUser) {
             const user = JSON.parse(storedUser);
-            userName = user.name || user.username || "User";
+            userName = String(user?.name || user?.username || "User");
+            userAvatar = typeof user?.avatar === "string" ? user.avatar : "";
         }
     } catch {
         userName = "User";
@@ -55,6 +90,169 @@ function Navbar({
             window.removeEventListener("keydown", handleShortcut);
         };
     }, []);
+
+    useEffect(() => {
+        const token =
+            localStorage.getItem("token") ||
+            sessionStorage.getItem("token");
+
+        if (!token) return;
+
+        let active = true;
+
+        async function loadTasks() {
+            try {
+                const response = await api.get("/tasks", {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                if (active) {
+                    setTasks(
+                        Array.isArray(response.data) ? response.data : []
+                    );
+                }
+            } catch {
+                if (active) setTasks([]);
+            }
+        }
+
+        loadTasks();
+
+        return () => {
+            active = false;
+        };
+    }, []);
+
+    useEffect(() => {
+        localStorage.setItem(
+            "taskflow_reminders",
+            JSON.stringify(reminders)
+        );
+    }, [reminders]);
+
+    const today = localDateString();
+
+    const taskReminders = tasks
+        .map((task) => {
+            const rawDate =
+                typeof task.dueDate === "string"
+                    ? task.dueDate
+                    : typeof task.due_date === "string"
+                    ? task.due_date
+                    : "";
+
+            return { task, date: rawDate ? rawDate.slice(0, 10) : "" };
+        })
+        .filter(
+            ({ task, date }) =>
+                date && task.status !== "Completed" && date <= today
+        )
+        .map(({ task, date }) => ({
+            id: `task-${task.id}`,
+            title: task.title || "Untitled task",
+            detail:
+                date === today
+                    ? "Due today"
+                    : `Date passed · ${formatReminderDate(date)}`,
+            path: "/my-tasks",
+            kind: "task",
+            group: date === today ? "today" : "overdue",
+        }));
+
+    const customReminders = reminders.map((reminder) => ({
+        id: reminder.id,
+        title: reminder.title,
+        detail:
+            reminder.date === today
+                ? "Today"
+                : formatReminderDate(reminder.date),
+        path: "",
+        kind: "custom",
+        group: "custom",
+    }));
+
+    const overdueItems = taskReminders.filter(
+        (item) => item.group === "overdue"
+    );
+    const todayItems = taskReminders.filter((item) => item.group === "today");
+    const notificationItems = [
+        ...customReminders,
+        ...overdueItems,
+        ...todayItems,
+    ];
+
+    function addReminder(event) {
+        event.preventDefault();
+
+        const cleanTitle = reminderTitle.trim();
+
+        if (!cleanTitle || !reminderDate) return;
+
+        setReminders((previous) => [
+            ...previous,
+            {
+                id: `rem-${Date.now()}`,
+                title: cleanTitle,
+                date: reminderDate,
+            },
+        ]);
+        setReminderTitle("");
+        setReminderDate(localDateString());
+        setShowReminderForm(false);
+    }
+
+    function removeReminder(id) {
+        setReminders((previous) =>
+            previous.filter((reminder) => reminder.id !== id)
+        );
+    }
+
+    function openReminder(item) {
+        setShowNotifications(false);
+
+        if (item.path) navigate(item.path);
+    }
+
+    function renderNotificationItem(item) {
+        return (
+            <div
+                className="notification-item"
+                key={item.id}
+                role="button"
+                tabIndex={0}
+                onClick={() => openReminder(item)}
+                onKeyDown={(event) => {
+                    if (event.key === "Enter") {
+                        openReminder(item);
+                    }
+                }}
+            >
+                <span
+                    className={`notification-icon notification-icon-${item.kind}`}
+                >
+                    {item.kind === "task" ? "✓" : "◷"}
+                </span>
+
+                <div>
+                    <strong>{item.title}</strong>
+                    <small>{item.detail}</small>
+                </div>
+
+                {item.kind === "custom" && (
+                    <button
+                        type="button"
+                        className="notification-remove"
+                        aria-label="Remove reminder"
+                        onClick={(event) => {
+                            event.stopPropagation();
+                            removeReminder(item.id);
+                        }}
+                    >
+                        ×
+                    </button>
+                )}
+            </div>
+        );
+    }
 
     const handleSearch = (value) => {
         setSearch(value);
@@ -95,7 +293,8 @@ function Navbar({
 
                 <div className="navbar-page">
                     <div className="navbar-breadcrumb">
-                        Workspace <span>/</span> Overview
+                        <Link to="/dashboard">Workspace</Link>{" "}
+                        <span>/</span> {pageTitle}
                     </div>
 
                     <h2>{pageTitle}</h2>
@@ -170,16 +369,110 @@ function Navbar({
                         title="Notifications"
                     >
                         ♧
-                        <span className="notification-dot"></span>
+                        {notificationItems.length > 0 && (
+                            <span className="notification-dot"></span>
+                        )}
                     </button>
 
                     {showNotifications && (
                         <div className="navbar-dropdown notification-dropdown">
-                            <h4>Notifications</h4>
-                            <p>You’re all caught up!</p>
-                            <span>
-                                New task reminders will appear here.
-                            </span>
+                            <div className="notification-head">
+                                <h4>Reminders</h4>
+                                <span className="notification-count">
+                                    {notificationItems.length}
+                                </span>
+                            </div>
+
+                            {notificationItems.length === 0 &&
+                            !showReminderForm ? (
+                                <>
+                                    <p>You’re all caught up!</p>
+                                    <span>
+                                        Task deadlines and your reminders
+                                        will appear here.
+                                    </span>
+                                </>
+                            ) : (
+                                <div className="notification-list">
+                                    {customReminders.length > 0 && (
+                                        <>
+                                            <span className="notification-section-label">
+                                                My reminders
+                                            </span>
+                                            {customReminders.map(
+                                                renderNotificationItem
+                                            )}
+                                        </>
+                                    )}
+
+                                    {overdueItems.length > 0 && (
+                                        <>
+                                            <span className="notification-section-label notification-label-overdue">
+                                                Date passed
+                                            </span>
+                                            {overdueItems.map(
+                                                renderNotificationItem
+                                            )}
+                                        </>
+                                    )}
+
+                                    {todayItems.length > 0 && (
+                                        <>
+                                            <span className="notification-section-label">
+                                                Due today
+                                            </span>
+                                            {todayItems.map(
+                                                renderNotificationItem
+                                            )}
+                                        </>
+                                    )}
+                                </div>
+                            )}
+
+                            {!showReminderForm ? (
+                                <button
+                                    type="button"
+                                    className="notification-add"
+                                    onClick={() => setShowReminderForm(true)}
+                                >
+                                    ＋ Add reminder
+                                </button>
+                            ) : (
+                                <form
+                                    className="notification-form"
+                                    onSubmit={addReminder}
+                                >
+                                    <input
+                                        type="text"
+                                        placeholder="Reminder title..."
+                                        value={reminderTitle}
+                                        onChange={(event) =>
+                                            setReminderTitle(event.target.value)
+                                        }
+                                        maxLength={60}
+                                    />
+
+                                    <input
+                                        type="date"
+                                        value={reminderDate}
+                                        onChange={(event) =>
+                                            setReminderDate(event.target.value)
+                                        }
+                                    />
+
+                                    <div className="notification-form-actions">
+                                        <button type="submit">Add</button>
+                                        <button
+                                            type="button"
+                                            onClick={() =>
+                                                setShowReminderForm(false)
+                                            }
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </form>
+                            )}
                         </div>
                     )}
 
@@ -198,7 +491,11 @@ function Navbar({
                         aria-expanded={showProfile}
                     >
                         <span className="navbar-avatar">
-                            {userName.charAt(0).toUpperCase()}
+                            {userAvatar ? (
+                                <img src={userAvatar} alt="Profile" />
+                            ) : (
+                                String(userName || "U").charAt(0).toUpperCase()
+                            )}
                         </span>
 
                         <span className="navbar-user-name">
@@ -212,26 +509,35 @@ function Navbar({
                         <div className="navbar-dropdown profile-dropdown">
 
                             <div className="dropdown-user">
-                                <strong>{userName}</strong>
-                                <span>Personal Workspace</span>
+                                <span className="dropdown-user-avatar">
+                                    {userAvatar ? (
+                                        <img src={userAvatar} alt="Profile" />
+                                    ) : (
+                                        String(userName || "U").charAt(0).toUpperCase()
+                                    )}
+                                </span>
+                                <div>
+                                    <strong>{userName}</strong>
+                                    <span>Personal Workspace</span>
+                                </div>
                             </div>
 
                             <button
                                 type="button"
-                                onClick={() =>
-                                    window.alert("Profile page coming soon!")
-                                }
+                                onClick={() => {
+                                    setShowProfile(false);
+                                    navigate("/profile");
+                                }}
                             >
                                 ♙ &nbsp; My Profile
                             </button>
 
                             <button
                                 type="button"
-                                onClick={() =>
-                                    window.alert(
-                                        "Workspace settings coming soon!"
-                                    )
-                                }
+                                onClick={() => {
+                                    setShowProfile(false);
+                                    navigate("/settings");
+                                }}
                             >
                                 ⚙ &nbsp; Workspace Settings
                             </button>
