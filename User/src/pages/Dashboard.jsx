@@ -5,10 +5,17 @@ import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
 import "./Dashboard.css";
 
-function Dashboard ({ darkMode, setDarkMode })  {
-    const user = JSON.parse(localStorage.getItem("user") || "null");
+function Dashboard({ darkMode, setDarkMode }) {
+    const user = JSON.parse(
+        localStorage.getItem("user") ||
+        sessionStorage.getItem("user") ||
+        "null"
+    );
 
-    
+    // Sidebar open / close
+    const [sidebarOpen, setSidebarOpen] = useState(
+        () => window.innerWidth > 700
+    );
 
     const [showForm, setShowForm] = useState(false);
     const [title, setTitle] = useState("");
@@ -28,6 +35,7 @@ function Dashboard ({ darkMode, setDarkMode })  {
         getTasks();
     }, []);
 
+    // Get all tasks
     async function getTasks() {
         try {
             const token =
@@ -35,9 +43,11 @@ function Dashboard ({ darkMode, setDarkMode })  {
                 sessionStorage.getItem("token");
 
             const response = await axios.get(
-                "https://taskflow-backend-opjd.onrender.com/tasks",
+                "http://localhost:5000/tasks",
                 {
-                    headers: { Authorization: `Bearer ${token}` }
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
                 }
             );
 
@@ -49,6 +59,7 @@ function Dashboard ({ darkMode, setDarkMode })  {
         }
     }
 
+    // Reset form
     function resetForm() {
         setTitle("");
         setDescription("");
@@ -59,6 +70,7 @@ function Dashboard ({ darkMode, setDarkMode })  {
         setShowForm(false);
     }
 
+    // Add task
     async function addTask() {
         if (!title.trim()) {
             alert("Please enter a task title.");
@@ -79,10 +91,12 @@ function Dashboard ({ darkMode, setDarkMode })  {
                 sessionStorage.getItem("token");
 
             await axios.post(
-                "https://taskflow-backend-opjd.onrender.com/tasks",
+                "http://localhost:5000/tasks",
                 newTask,
                 {
-                    headers: { Authorization: `Bearer ${token}` }
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
                 }
             );
 
@@ -90,10 +104,14 @@ function Dashboard ({ darkMode, setDarkMode })  {
             resetForm();
         } catch (error) {
             console.log(error);
-            alert(error.response?.data?.message || "Task could not be added");
+            alert(
+                error.response?.data?.message ||
+                "Task could not be added"
+            );
         }
     }
 
+    // Update task
     async function updateTask() {
         const taskId = tasks[editIndex].id;
 
@@ -111,10 +129,12 @@ function Dashboard ({ darkMode, setDarkMode })  {
                 sessionStorage.getItem("token");
 
             await axios.put(
-                `https://taskflow-backend-opjd.onrender.com/tasks/${taskId}`,
+                `http://localhost:5000/tasks/${taskId}`,
                 updatedTask,
                 {
-                    headers: { Authorization: `Bearer ${token}` }
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
                 }
             );
 
@@ -122,12 +142,20 @@ function Dashboard ({ darkMode, setDarkMode })  {
             resetForm();
         } catch (error) {
             console.log(error);
-            alert(error.response?.data?.message || "Task could not be updated");
+            alert(
+                error.response?.data?.message ||
+                "Task could not be updated"
+            );
         }
     }
 
+    // Delete task
     async function deleteTask(task) {
-        if (!window.confirm("Are you sure you want to delete this task?")) {
+        if (
+            !window.confirm(
+                "Are you sure you want to delete this task?"
+            )
+        ) {
             return;
         }
 
@@ -137,21 +165,29 @@ function Dashboard ({ darkMode, setDarkMode })  {
                 sessionStorage.getItem("token");
 
             await axios.delete(
-                `https://taskflow-backend-opjd.onrender.com/tasks/${task.id}`,
+                `http://localhost:5000/tasks/${task.id}`,
                 {
-                    headers: { Authorization: `Bearer ${token}` }
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
                 }
             );
 
             await getTasks();
         } catch (error) {
             console.log(error);
-            alert(error.response?.data?.message || "Task could not be deleted");
+            alert(
+                error.response?.data?.message ||
+                "Task could not be deleted"
+            );
         }
     }
 
+    // Edit task
     function editTask(task) {
-        const index = tasks.findIndex((item) => item.id === task.id);
+        const index = tasks.findIndex(
+            (item) => item.id === task.id
+        );
 
         setTitle(task.title || "");
         setDescription(task.description || "");
@@ -161,7 +197,10 @@ function Dashboard ({ darkMode, setDarkMode })  {
         setEditIndex(index);
         setShowForm(true);
 
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
     }
 
     // Task Statistics
@@ -178,38 +217,53 @@ function Dashboard ({ darkMode, setDarkMode })  {
     ).length;
 
     const completionRate = tasks.length
-        ? Math.round((completedTasks / tasks.length) * 100)
+        ? Math.round(
+            (completedTasks / tasks.length) * 100
+        )
         : 0;
 
+    // Get task date
     function getTaskDate(task) {
         return task.dueDate || task.due_date || "";
     }
 
-    // Safe date validation and formatting
+    // Validate date
     function isValidDate(dateString) {
         if (!dateString) return false;
 
-        const date = new Date(`${dateString}T12:00:00`);
+        const date = new Date(
+            `${dateString}T12:00:00`
+        );
+
         return !Number.isNaN(date.getTime());
     }
 
+    // Format date
     function formatTaskDate(dateString) {
-        if (!isValidDate(dateString)) return "No due date";
+        if (!isValidDate(dateString)) {
+            return "No due date";
+        }
 
-        return new Date(`${dateString}T12:00:00`).toLocaleDateString(
-            "en-US",
-            {
-                day: "numeric",
-                month: "short"
-            }
-        );
+        return new Date(
+            `${dateString}T12:00:00`
+        ).toLocaleDateString("en-US", {
+            day: "numeric",
+            month: "short"
+        });
     }
 
+    // Get today's date
     function getLocalToday() {
         const date = new Date();
+
         const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-        const day = String(date.getDate()).padStart(2, "0");
+        const month = String(
+            date.getMonth() + 1
+        ).padStart(2, "0");
+
+        const day = String(
+            date.getDate()
+        ).padStart(2, "0");
 
         return `${year}-${month}-${day}`;
     }
@@ -220,8 +274,12 @@ function Dashboard ({ darkMode, setDarkMode })  {
     const filteredTasks = tasks
         .filter((task) => {
             const matchesSearch =
-                (task.title || "").toLowerCase().includes(search.toLowerCase()) ||
-                (task.description || "").toLowerCase().includes(search.toLowerCase());
+                (task.title || "")
+                    .toLowerCase()
+                    .includes(search.toLowerCase()) ||
+                (task.description || "")
+                    .toLowerCase()
+                    .includes(search.toLowerCase());
 
             const matchesPriority =
                 priorityFilter === "All" ||
@@ -253,14 +311,24 @@ function Dashboard ({ darkMode, setDarkMode })  {
                 task.status !== "Completed"
             );
         })
-        .sort((a, b) => getTaskDate(a).localeCompare(getTaskDate(b)))
+        .sort((a, b) =>
+            getTaskDate(a).localeCompare(getTaskDate(b))
+        )
         .slice(0, 4);
 
     return (
-        <div className={`taskflow-layout ${darkMode ? "dark-mode" : ""}`}>
+        <div
+            className={`taskflow-layout ${
+                darkMode ? "dark-mode" : ""
+            }`}
+        >
 
-            <Sidebar darkMode={darkMode} />
+            {/* Sidebar */}
+            {sidebarOpen && (
+                <Sidebar darkMode={darkMode} />
+            )}
 
+            {/* Main Dashboard */}
             <main className="taskflow-main">
 
                 <Navbar
@@ -268,6 +336,9 @@ function Dashboard ({ darkMode, setDarkMode })  {
                     setDarkMode={setDarkMode}
                     onSearch={setSearch}
                     pageTitle="Dashboard"
+                    onToggleSidebar={() => {
+                        setSidebarOpen((prev) => !prev);
+                    }}
                 />
 
                 <div className="dashboard-content">
@@ -309,6 +380,7 @@ function Dashboard ({ darkMode, setDarkMode })  {
                                 <div className="summary-icon">▤</div>
                                 <span className="summary-tag">All tasks</span>
                             </div>
+
                             <h3>Total Tasks</h3>
                             <h2>{tasks.length}</h2>
                             <p>Your complete workload</p>
@@ -319,6 +391,7 @@ function Dashboard ({ darkMode, setDarkMode })  {
                                 <div className="summary-icon">✓</div>
                                 <span className="summary-tag">Done</span>
                             </div>
+
                             <h3>Completed</h3>
                             <h2>{completedTasks}</h2>
                             <p>Tasks finished</p>
@@ -329,6 +402,7 @@ function Dashboard ({ darkMode, setDarkMode })  {
                                 <div className="summary-icon">◷</div>
                                 <span className="summary-tag">To do</span>
                             </div>
+
                             <h3>Pending</h3>
                             <h2>{pendingTasks}</h2>
                             <p>Tasks left to complete</p>
@@ -339,6 +413,7 @@ function Dashboard ({ darkMode, setDarkMode })  {
                                 <div className="summary-icon">↗</div>
                                 <span className="summary-tag">Active</span>
                             </div>
+
                             <h3>In Progress</h3>
                             <h2>{inProgressTasks}</h2>
                             <p>Currently in progress</p>
@@ -349,10 +424,15 @@ function Dashboard ({ darkMode, setDarkMode })  {
                     {/* Insights Section */}
                     <section className="insights-grid">
 
+                        {/* Completion Rate */}
                         <div className="insight-card completion-card">
                             <div>
-                                <p className="panel-eyebrow">YOUR PROGRESS</p>
+                                <p className="panel-eyebrow">
+                                    YOUR PROGRESS
+                                </p>
+
                                 <h2>Completion rate</h2>
+
                                 <p className="panel-description">
                                     Keep going — every task counts.
                                 </p>
@@ -378,14 +458,21 @@ function Dashboard ({ darkMode, setDarkMode })  {
                             </div>
                         </div>
 
+                        {/* Upcoming Deadlines */}
                         <div className="insight-card deadlines-card">
 
                             <div className="panel-heading">
                                 <div>
-                                    <p className="panel-eyebrow">COMING UP</p>
+                                    <p className="panel-eyebrow">
+                                        COMING UP
+                                    </p>
+
                                     <h2>Upcoming deadlines</h2>
                                 </div>
-                                <span className="panel-heading-icon">▦</span>
+
+                                <span className="panel-heading-icon">
+                                    ▦
+                                </span>
                             </div>
 
                             {upcomingTasks.length === 0 ? (
@@ -425,11 +512,13 @@ function Dashboard ({ darkMode, setDarkMode })  {
                                                 <div className="deadline-info">
                                                     <strong>{task.title}</strong>
 
-                                                    <span className={
-                                                        overdue
-                                                            ? "deadline-overdue"
-                                                            : ""
-                                                    }>
+                                                    <span
+                                                        className={
+                                                            overdue
+                                                                ? "deadline-overdue"
+                                                                : ""
+                                                        }
+                                                    >
                                                         {overdue
                                                             ? "Overdue"
                                                             : taskDate === today
@@ -450,9 +539,15 @@ function Dashboard ({ darkMode, setDarkMode })  {
                     {/* Task Header */}
                     <section className="task-header">
                         <div>
-                            <p className="section-eyebrow">STAY PRODUCTIVE</p>
+                            <p className="section-eyebrow">
+                                STAY PRODUCTIVE
+                            </p>
+
                             <h2>My Tasks</h2>
-                            <p>Search, organise and manage your work.</p>
+
+                            <p>
+                                Search, organise and manage your work.
+                            </p>
                         </div>
 
                         <button
@@ -478,7 +573,10 @@ function Dashboard ({ darkMode, setDarkMode })  {
                                             ? "Create New Task"
                                             : "Edit Task"}
                                     </h2>
-                                    <p>Enter your task details below.</p>
+
+                                    <p>
+                                        Enter your task details below.
+                                    </p>
                                 </div>
 
                                 <button
@@ -494,6 +592,7 @@ function Dashboard ({ darkMode, setDarkMode })  {
                             <form
                                 onSubmit={(event) => {
                                     event.preventDefault();
+
                                     editIndex === null
                                         ? addTask()
                                         : updateTask();
@@ -565,9 +664,11 @@ function Dashboard ({ darkMode, setDarkMode })  {
                                             }
                                         >
                                             <option value="Todo">Todo</option>
+
                                             <option value="In Progress">
                                                 In Progress
                                             </option>
+
                                             <option value="Completed">
                                                 Completed
                                             </option>
@@ -620,6 +721,7 @@ function Dashboard ({ darkMode, setDarkMode })  {
                         <div className="task-list-heading">
                             <div>
                                 <h2>All Tasks</h2>
+
                                 <p className="task-count-description">
                                     {filteredTasks.length} matching tasks
                                 </p>
@@ -678,8 +780,12 @@ function Dashboard ({ darkMode, setDarkMode })  {
 
                             <div className="empty-state">
                                 <div className="empty-icon">◷</div>
+
                                 <h3>Loading your tasks...</h3>
-                                <p>Your workspace is getting ready.</p>
+
+                                <p>
+                                    Your workspace is getting ready.
+                                </p>
                             </div>
 
                         ) : filteredTasks.length === 0 ? (
@@ -755,7 +861,9 @@ function Dashboard ({ darkMode, setDarkMode })  {
                                                 </span>
 
                                                 <span className="task-due-date">
-                                                    📅 {formatTaskDate(getTaskDate(task))}
+                                                    📅 {formatTaskDate(
+                                                        getTaskDate(task)
+                                                    )}
                                                 </span>
 
                                             </div>

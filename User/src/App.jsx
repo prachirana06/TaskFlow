@@ -10,108 +10,143 @@ import Calendar from "./pages/Calendar.jsx";
 import Analytics from "./pages/Analytics.jsx";
 import Settings from "./pages/Settings.jsx";
 
+import { SidebarContext } from "./SidebarContext";
+
 // Check whether user is logged in
 function ProtectedRoute({ children }) {
-  const token =
-    localStorage.getItem("token") ||
-    sessionStorage.getItem("token");
+    const token =
+        localStorage.getItem("token") ||
+        sessionStorage.getItem("token");
 
-  return token ? children : <Navigate to="/login" replace />;
+    return token ? children : <Navigate to="/login" replace />;
 }
 
 function App() {
-  const [darkMode, setDarkMode] = useState(() => {
-    return localStorage.getItem("darkMode") === "true";
-  });
+    const [darkMode, setDarkMode] = useState(() => {
+        return localStorage.getItem("darkMode") === "true";
+    });
 
-  useEffect(() => {
-    localStorage.setItem("darkMode", darkMode);
-  }, [darkMode]);
+    // One common sidebar state for every page
+    const [sidebarOpen, setSidebarOpen] = useState(
+        () => window.innerWidth > 700
+    );
 
-  const token =
-    localStorage.getItem("token") ||
-    sessionStorage.getItem("token");
+    useEffect(() => {
+        localStorage.setItem("darkMode", darkMode);
+    }, [darkMode]);
 
-  return (
-    <BrowserRouter>
-      <Routes>
+    function toggleSidebar() {
+        setSidebarOpen((previous) => !previous);
+    }
 
-        {/* Default page */}
-        <Route
-          path="/"
-          element={
-            <Navigate
-              to={token ? "/dashboard" : "/login"}
-              replace
-            />
-          }
-        />
+    function closeSidebar() {
+        setSidebarOpen(false);
+    }
 
-        {/* Login */}
-        <Route path="/login" element={<Login />} />
+    const token =
+        localStorage.getItem("token") ||
+        sessionStorage.getItem("token");
 
-        {/* Register */}
-        <Route path="/register" element={<Register />} />
+    return (
+        <SidebarContext.Provider
+            value={{
+                sidebarOpen,
+                toggleSidebar,
+                closeSidebar,
+            }}
+        >
+            <BrowserRouter>
+                <Routes>
 
-        {/* Dashboard */}
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <Dashboard darkMode={darkMode} setDarkMode={setDarkMode} />
-            </ProtectedRoute>
-          }
-        />
+                    <Route
+                        path="/"
+                        element={
+                            <Navigate
+                                to={token ? "/dashboard" : "/login"}
+                                replace
+                            />
+                        }
+                    />
 
-        {/* My Tasks */}
-        <Route
-          path="/my-tasks"
-          element={
-            <ProtectedRoute>
-              <MyTasks darkMode={darkMode} setDarkMode={setDarkMode} />
-            </ProtectedRoute>
-          }
-        />
+                    <Route
+                        path="/login"
+                        element={<Login />}
+                    />
 
-        {/* Calendar */}
-        <Route
-          path="/calendar"
-          element={
-            <ProtectedRoute>
-              <Calendar darkMode={darkMode} setDarkMode={setDarkMode} />
-            </ProtectedRoute>
-          }
-        />
+                    <Route
+                        path="/register"
+                        element={<Register />}
+                    />
 
-        {/* Analytics */}
-        <Route
-          path="/analytics"
-          element={
-            <ProtectedRoute>
-              <Analytics darkMode={darkMode} setDarkMode={setDarkMode} />
-            </ProtectedRoute>
-          }
-        />
+                    <Route
+                        path="/dashboard"
+                        element={
+                            <ProtectedRoute>
+                                <Dashboard
+                                    darkMode={darkMode}
+                                    setDarkMode={setDarkMode}
+                                />
+                            </ProtectedRoute>
+                        }
+                    />
 
-        {/* Settings */}
-        <Route
-          path="/settings"
-          element={
-            <ProtectedRoute>
-              <Settings darkMode={darkMode} setDarkMode={setDarkMode} />
-            </ProtectedRoute>
-          }
-        />
+                    <Route
+                        path="/my-tasks"
+                        element={
+                            <ProtectedRoute>
+                                <MyTasks
+                                    darkMode={darkMode}
+                                    setDarkMode={setDarkMode}
+                                />
+                            </ProtectedRoute>
+                        }
+                    />
 
-        {/* Unknown URLs */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+                    <Route
+                        path="/calendar"
+                        element={
+                            <ProtectedRoute>
+                                <Calendar
+                                    darkMode={darkMode}
+                                    setDarkMode={setDarkMode}
+                                />
+                            </ProtectedRoute>
+                        }
+                    />
 
-      </Routes>
-    </BrowserRouter>
-  );
+                    <Route
+                        path="/analytics"
+                        element={
+                            <ProtectedRoute>
+                                <Analytics
+                                    darkMode={darkMode}
+                                    setDarkMode={setDarkMode}
+                                />
+                            </ProtectedRoute>
+                        }
+                    />
 
+                    <Route
+                        path="/settings"
+                        element={
+                            <ProtectedRoute>
+                                <Settings
+                                    darkMode={darkMode}
+                                    setDarkMode={setDarkMode}
+                                />
+                            </ProtectedRoute>
+                        }
+                    />
 
+                    <Route
+                        path="*"
+                        element={<Navigate to="/" replace />}
+                    />
 
+                </Routes>
+            </BrowserRouter>
+        </SidebarContext.Provider>
+    );
 }
 
 export default App;

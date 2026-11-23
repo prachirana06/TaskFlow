@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from "react";
+import { useSidebar } from "../SidebarContext";
 import "./Navbar.css";
 
 function Navbar({
@@ -10,6 +11,8 @@ function Navbar({
     setDarkMode,
     pageTitle = "Dashboard",
 }) {
+    const { toggleSidebar } = useSidebar();
+
     const [search, setSearch] = useState("");
     const [focusMode, setFocusMode] = useState(false);
     const [showNotifications, setShowNotifications] = useState(false);
@@ -24,13 +27,12 @@ function Navbar({
 
         if (storedUser) {
             const user = JSON.parse(storedUser);
-            userName = user.name || user.username || "Prachi";
+            userName = user.name || user.username || "User";
         }
     } catch {
-        userName = "Prachi";
+        userName = "User";
     }
 
-    // Keyboard shortcuts
     useEffect(() => {
         const handleShortcut = (event) => {
             if (
@@ -54,7 +56,6 @@ function Navbar({
         };
     }, []);
 
-    // Search handler
     const handleSearch = (value) => {
         setSearch(value);
 
@@ -63,26 +64,29 @@ function Navbar({
         }
     };
 
-    // Logout handler
     const handleLogout = () => {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
         sessionStorage.removeItem("token");
         sessionStorage.removeItem("user");
 
-        window.location.href = "/";
+        window.location.href = "/login";
     };
 
     return (
         <header
-            className={`taskflow-navbar ${darkMode ? "navbar-dark" : ""}`}
+            className={`taskflow-navbar ${
+                darkMode ? "navbar-dark" : ""
+            }`}
         >
+
             {/* Left Section */}
             <div className="navbar-start">
+
                 <button
                     type="button"
                     className="navbar-icon-btn sidebar-toggle"
-                    onClick={onToggleSidebar}
+                    onClick={onToggleSidebar || toggleSidebar}
                     aria-label="Toggle sidebar"
                     title="Toggle sidebar"
                 >
@@ -96,6 +100,7 @@ function Navbar({
 
                     <h2>{pageTitle}</h2>
                 </div>
+
             </div>
 
             {/* Search Section */}
@@ -107,7 +112,9 @@ function Navbar({
                     type="search"
                     placeholder="Search your tasks..."
                     value={search}
-                    onChange={(event) => handleSearch(event.target.value)}
+                    onChange={(event) =>
+                        handleSearch(event.target.value)
+                    }
                     aria-label="Search tasks"
                 />
 
@@ -116,13 +123,15 @@ function Navbar({
 
             {/* Right Section */}
             <div className="navbar-actions">
-                {/* Focus Mode */}
+
                 <button
                     type="button"
                     className={`focus-badge ${
                         focusMode ? "focus-active" : ""
                     }`}
-                    onClick={() => setFocusMode((prev) => !prev)}
+                    onClick={() =>
+                        setFocusMode((previous) => !previous)
+                    }
                     title="Toggle focus mode"
                     aria-pressed={focusMode}
                 >
@@ -130,13 +139,16 @@ function Navbar({
                     {focusMode ? "In Focus" : "Focus Mode"}
                 </button>
 
-                {/* Dark / Light Theme */}
                 <button
                     type="button"
                     className="navbar-icon-btn theme-toggle"
-                    onClick={() => setDarkMode((prev) => !prev)}
+                    onClick={() =>
+                        setDarkMode?.((previous) => !previous)
+                    }
                     aria-label={
-                        darkMode ? "Switch to light mode" : "Switch to dark mode"
+                        darkMode
+                            ? "Switch to light mode"
+                            : "Switch to dark mode"
                     }
                     title={darkMode ? "Light Mode" : "Dark Mode"}
                 >
@@ -145,11 +157,12 @@ function Navbar({
 
                 {/* Notifications */}
                 <div className="navbar-popup-wrap">
+
                     <button
                         type="button"
                         className="navbar-icon-btn notification-btn"
                         onClick={() => {
-                            setShowNotifications((prev) => !prev);
+                            setShowNotifications((previous) => !previous);
                             setShowProfile(false);
                         }}
                         aria-label="Notifications"
@@ -169,15 +182,17 @@ function Navbar({
                             </span>
                         </div>
                     )}
+
                 </div>
 
                 {/* Profile */}
                 <div className="navbar-popup-wrap">
+
                     <button
                         type="button"
                         className="navbar-profile-btn"
                         onClick={() => {
-                            setShowProfile((prev) => !prev);
+                            setShowProfile((previous) => !previous);
                             setShowNotifications(false);
                         }}
                         aria-expanded={showProfile}
@@ -195,6 +210,7 @@ function Navbar({
 
                     {showProfile && (
                         <div className="navbar-dropdown profile-dropdown">
+
                             <div className="dropdown-user">
                                 <strong>{userName}</strong>
                                 <span>Personal Workspace</span>
@@ -212,7 +228,9 @@ function Navbar({
                             <button
                                 type="button"
                                 onClick={() =>
-                                    window.alert("Workspace settings coming soon!")
+                                    window.alert(
+                                        "Workspace settings coming soon!"
+                                    )
                                 }
                             >
                                 ⚙ &nbsp; Workspace Settings
@@ -225,9 +243,12 @@ function Navbar({
                             >
                                 ↪ &nbsp; Logout
                             </button>
+
                         </div>
                     )}
+
                 </div>
+
             </div>
         </header>
     );
