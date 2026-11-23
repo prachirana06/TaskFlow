@@ -13,6 +13,11 @@ import Settings from "./pages/Settings.jsx";
 import { SidebarContext } from "./SidebarContext";
 import ErrorBoundary from "./components/ErrorBoundary";
 
+const basename =
+    import.meta.env.BASE_URL === "/"
+        ? ""
+        : import.meta.env.BASE_URL.replace(/\/$/, "");
+
 // Check whether user is logged in
 function ProtectedRoute({ children }) {
     const token =
@@ -65,7 +70,7 @@ function App() {
                 closeSidebar,
             }}
         >
-            <BrowserRouter>
+            <BrowserRouter basename={basename}>
                 <ErrorBoundary>
                     <Routes>
 
