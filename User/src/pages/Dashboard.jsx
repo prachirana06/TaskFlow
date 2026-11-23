@@ -43,7 +43,7 @@ function Dashboard({ darkMode, setDarkMode }) {
                 sessionStorage.getItem("token");
 
             const response = await axios.get(
-                "http://localhost:5000/tasks",
+                "https://taskflow-backend-opjd.onrender.com/tasks",
                 {
                     headers: {
                         Authorization: `Bearer ${token}`
@@ -91,7 +91,7 @@ function Dashboard({ darkMode, setDarkMode }) {
                 sessionStorage.getItem("token");
 
             await axios.post(
-                "http://localhost:5000/tasks",
+                "https://taskflow-backend-opjd.onrender.com/tasks",
                 newTask,
                 {
                     headers: {
@@ -129,7 +129,7 @@ function Dashboard({ darkMode, setDarkMode }) {
                 sessionStorage.getItem("token");
 
             await axios.put(
-                `http://localhost:5000/tasks/${taskId}`,
+                `https://taskflow-backend-opjd.onrender.com/tasks/${taskId}`,
                 updatedTask,
                 {
                     headers: {
@@ -165,7 +165,7 @@ function Dashboard({ darkMode, setDarkMode }) {
                 sessionStorage.getItem("token");
 
             await axios.delete(
-                `http://localhost:5000/tasks/${task.id}`,
+                `https://taskflow-backend-opjd.onrender.com/tasks/${task.id}`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`
