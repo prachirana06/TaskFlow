@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../api";
 import "./Register.css";
 
 function Register() {
@@ -47,8 +47,8 @@ function Register() {
         try {
             setLoading(true);
 
-            const response = await axios.post(
-                "https://taskflow-backend-opjd.onrender.com/register/send-otp",
+            const response = await api.post(
+                "/register/send-otp",
                 {
                     name: name.trim(),
                     email: email.trim(),
@@ -85,8 +85,8 @@ function Register() {
         try {
             setLoading(true);
 
-            const response = await axios.post(
-                "https://taskflow-backend-opjd.onrender.com/register/verify-otp",
+            const response = await api.post(
+                "/register/verify-otp",
                 {
                     email: email.trim(),
                     otp: otp.trim()
@@ -123,8 +123,8 @@ function Register() {
         try {
             setLoading(true);
 
-            const response = await axios.post(
-                "https://taskflow-backend-opjd.onrender.com/register/send-otp",
+            const response = await api.post(
+                "/register/send-otp",
                 {
                     name: name.trim(),
                     email: email.trim(),

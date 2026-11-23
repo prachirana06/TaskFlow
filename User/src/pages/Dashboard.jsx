@@ -1,8 +1,11 @@
 
 import { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../api";
 import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
+import QuickNav from "../components/QuickNav";
+import { Link } from "react-router-dom";
+import { useSidebar } from "../SidebarContext";
 import "./Dashboard.css";
 
 function Dashboard({ darkMode, setDarkMode }) {
@@ -12,10 +15,7 @@ function Dashboard({ darkMode, setDarkMode }) {
         "null"
     );
 
-    // Sidebar open / close
-    const [sidebarOpen, setSidebarOpen] = useState(
-        () => window.innerWidth > 700
-    );
+    const { toggleSidebar } = useSidebar();
 
     const [showForm, setShowForm] = useState(false);
     const [title, setTitle] = useState("");
@@ -30,6 +30,7 @@ function Dashboard({ darkMode, setDarkMode }) {
     const [search, setSearch] = useState("");
     const [priorityFilter, setPriorityFilter] = useState("All");
     const [dateSort, setDateSort] = useState("none");
+    const [showTodayOnly, setShowTodayOnly] = useState(false);
 
     useEffect(() => {
         getTasks();
@@ -42,8 +43,8 @@ function Dashboard({ darkMode, setDarkMode }) {
                 localStorage.getItem("token") ||
                 sessionStorage.getItem("token");
 
-            const response = await axios.get(
-                "https://taskflow-backend-opjd.onrender.com/tasks",
+            const response = await api.get(
+                "/tasks",
                 {
                     headers: {
                         Authorization: `Bearer ${token}`
@@ -90,8 +91,8 @@ function Dashboard({ darkMode, setDarkMode }) {
                 localStorage.getItem("token") ||
                 sessionStorage.getItem("token");
 
-            await axios.post(
-                "https://taskflow-backend-opjd.onrender.com/tasks",
+            await api.post(
+                "/tasks",
                 newTask,
                 {
                     headers: {
@@ -128,8 +129,8 @@ function Dashboard({ darkMode, setDarkMode }) {
                 localStorage.getItem("token") ||
                 sessionStorage.getItem("token");
 
-            await axios.put(
-                `https://taskflow-backend-opjd.onrender.com/tasks/${taskId}`,
+            await api.put(
+                `/tasks/${taskId}`,
                 updatedTask,
                 {
                     headers: {
@@ -164,8 +165,8 @@ function Dashboard({ darkMode, setDarkMode }) {
                 localStorage.getItem("token") ||
                 sessionStorage.getItem("token");
 
-            await axios.delete(
-                `https://taskflow-backend-opjd.onrender.com/tasks/${task.id}`,
+            await api.delete(
+                `/tasks/${task.id}`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`
@@ -179,6 +180,41 @@ function Dashboard({ darkMode, setDarkMode }) {
             alert(
                 error.response?.data?.message ||
                 "Task could not be deleted"
+            );
+        }
+    }
+
+    async function toggleTaskStatus(task) {
+        const nextStatus =
+            task.status === "Completed" ? "Todo" : "Completed";
+
+        try {
+            const token =
+                localStorage.getItem("token") ||
+                sessionStorage.getItem("token");
+
+            await api.put(
+                `/tasks/${task.id}`,
+                {
+                    title: task.title,
+                    description: task.description || "",
+                    priority: task.priority || "Medium",
+                    status: nextStatus,
+                    dueDate: getTaskDate(task)
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            );
+
+            await getTasks();
+        } catch (error) {
+            console.log(error);
+            alert(
+                error.response?.data?.message ||
+                "Status could not be changed."
             );
         }
     }
@@ -269,6 +305,9 @@ function Dashboard({ darkMode, setDarkMode }) {
     }
 
     const today = getLocalToday();
+    const todayCount = tasks.filter(
+        (task) => getTaskDate(task) === today
+    ).length;
 
     // Search, Filter and Sorting
     const filteredTasks = tasks
@@ -285,7 +324,10 @@ function Dashboard({ darkMode, setDarkMode }) {
                 priorityFilter === "All" ||
                 (task.priority || "Medium") === priorityFilter;
 
-            return matchesSearch && matchesPriority;
+            const matchesDate =
+                !showTodayOnly || getTaskDate(task) === today;
+
+            return matchesSearch && matchesPriority && matchesDate;
         })
         .sort((a, b) => {
             if (dateSort === "none") return 0;
@@ -324,9 +366,7 @@ function Dashboard({ darkMode, setDarkMode }) {
         >
 
             {/* Sidebar */}
-            {sidebarOpen && (
-                <Sidebar darkMode={darkMode} />
-            )}
+            <Sidebar darkMode={darkMode} />
 
             {/* Main Dashboard */}
             <main className="taskflow-main">
@@ -336,9 +376,7 @@ function Dashboard({ darkMode, setDarkMode }) {
                     setDarkMode={setDarkMode}
                     onSearch={setSearch}
                     pageTitle="Dashboard"
-                    onToggleSidebar={() => {
-                        setSidebarOpen((prev) => !prev);
-                    }}
+                    onToggleSidebar={toggleSidebar}
                 />
 
                 <div className="dashboard-content">
@@ -371,6 +409,8 @@ function Dashboard({ darkMode, setDarkMode }) {
                             <span>✧</span>
                         </div>
                     </section>
+
+                    <QuickNav />
 
                     {/* Statistics Cards */}
                     <section className="cards">
@@ -456,6 +496,10 @@ function Dashboard({ darkMode, setDarkMode }) {
                                 <span>{completedTasks} completed</span>
                                 <span>{pendingTasks} remaining</span>
                             </div>
+
+                            <Link className="quicknav-cta" to="/analytics">
+                                Full report →
+                            </Link>
                         </div>
 
                         {/* Upcoming Deadlines */}
@@ -533,6 +577,9 @@ function Dashboard({ darkMode, setDarkMode }) {
                                 </div>
                             )}
 
+                            <Link className="quicknav-cta" to="/calendar">
+                                Open calendar →
+                            </Link>
                         </div>
                     </section>
 
@@ -548,6 +595,29 @@ function Dashboard({ darkMode, setDarkMode }) {
                             <p>
                                 Search, organise and manage your work.
                             </p>
+
+                            <div className="task-header-links">
+                                <button
+                                    type="button"
+                                    className={`quicknav-cta today-filter ${
+                                        showTodayOnly
+                                            ? "today-filter-active"
+                                            : ""
+                                    }`}
+                                    onClick={() =>
+                                        setShowTodayOnly((previous) => !previous)
+                                    }
+                                >
+                                    ☀ Today tasks ({todayCount})
+                                </button>
+
+                                <Link
+                                    className="quicknav-cta"
+                                    to="/my-tasks"
+                                >
+                                    See all tasks →
+                                </Link>
+                            </div>
                         </div>
 
                         <button
@@ -720,10 +790,16 @@ function Dashboard({ darkMode, setDarkMode }) {
 
                         <div className="task-list-heading">
                             <div>
-                                <h2>All Tasks</h2>
+                                <h2>
+                                    {showTodayOnly
+                                        ? "Today's Tasks"
+                                        : "All Tasks"}
+                                </h2>
 
                                 <p className="task-count-description">
-                                    {filteredTasks.length} matching tasks
+                                    {showTodayOnly
+                                        ? `${filteredTasks.length} due today`
+                                        : `${filteredTasks.length} matching tasks`}
                                 </p>
                             </div>
                         </div>
@@ -796,12 +872,16 @@ function Dashboard({ darkMode, setDarkMode }) {
                                 <h3>
                                     {tasks.length === 0
                                         ? "Your next win starts here"
+                                        : showTodayOnly
+                                        ? "No tasks for today"
                                         : "No matching tasks"}
                                 </h3>
 
                                 <p>
                                     {tasks.length === 0
                                         ? "Create your first task and turn your plans into progress."
+                                        : showTodayOnly
+                                        ? "Add a task due today or switch back to all tasks."
                                         : "Try another search term or change your filters."}
                                 </p>
 
@@ -827,11 +907,27 @@ function Dashboard({ darkMode, setDarkMode }) {
                                         key={task.id}
                                     >
 
-                                        <div className="task-checkmark">
+                                        <button
+                                            type="button"
+                                            className="task-checkmark"
+                                            onClick={() =>
+                                                toggleTaskStatus(task)
+                                            }
+                                            aria-label={
+                                                task.status === "Completed"
+                                                    ? "Mark as not done"
+                                                    : "Mark as done"
+                                            }
+                                            title={
+                                                task.status === "Completed"
+                                                    ? "Mark as not done"
+                                                    : "Mark as done"
+                                            }
+                                        >
                                             {task.status === "Completed"
                                                 ? "✓"
                                                 : "○"}
-                                        </div>
+                                        </button>
 
                                         <div className="task-details">
 
@@ -870,6 +966,18 @@ function Dashboard({ darkMode, setDarkMode }) {
                                         </div>
 
                                         <div className="task-actions">
+
+                                            <button
+                                                type="button"
+                                                className="done-button"
+                                                onClick={() =>
+                                                    toggleTaskStatus(task)
+                                                }
+                                            >
+                                                {task.status === "Completed"
+                                                    ? "↺ Reopen"
+                                                    : "✓ Done"}
+                                            </button>
 
                                             <button
                                                 type="button"

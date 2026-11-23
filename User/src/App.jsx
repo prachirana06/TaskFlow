@@ -11,6 +11,7 @@ import Analytics from "./pages/Analytics.jsx";
 import Settings from "./pages/Settings.jsx";
 
 import { SidebarContext } from "./SidebarContext";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 // Check whether user is logged in
 function ProtectedRoute({ children }) {
@@ -26,6 +27,10 @@ function App() {
         return localStorage.getItem("darkMode") === "true";
     });
 
+    const [accentColor, setAccentColor] = useState(() => {
+        return localStorage.getItem("accentColor") || "#187653";
+    });
+
     // One common sidebar state for every page
     const [sidebarOpen, setSidebarOpen] = useState(
         () => window.innerWidth > 700
@@ -34,6 +39,11 @@ function App() {
     useEffect(() => {
         localStorage.setItem("darkMode", darkMode);
     }, [darkMode]);
+
+    useEffect(() => {
+        localStorage.setItem("accentColor", accentColor);
+        document.documentElement.style.setProperty("--accent", accentColor);
+    }, [accentColor]);
 
     function toggleSidebar() {
         setSidebarOpen((previous) => !previous);
@@ -56,7 +66,8 @@ function App() {
             }}
         >
             <BrowserRouter>
-                <Routes>
+                <ErrorBoundary>
+                    <Routes>
 
                     <Route
                         path="/"
@@ -127,12 +138,29 @@ function App() {
                     />
 
                     <Route
+                        path="/profile"
+                        element={
+                            <ProtectedRoute>
+                                <Settings
+                                    darkMode={darkMode}
+                                    setDarkMode={setDarkMode}
+                                    accentColor={accentColor}
+                                    setAccentColor={setAccentColor}
+                                    profileMode
+                                />
+                            </ProtectedRoute>
+                        }
+                    />
+
+                    <Route
                         path="/settings"
                         element={
                             <ProtectedRoute>
                                 <Settings
                                     darkMode={darkMode}
                                     setDarkMode={setDarkMode}
+                                    accentColor={accentColor}
+                                    setAccentColor={setAccentColor}
                                 />
                             </ProtectedRoute>
                         }
@@ -143,7 +171,8 @@ function App() {
                         element={<Navigate to="/" replace />}
                     />
 
-                </Routes>
+                    </Routes>
+                </ErrorBoundary>
             </BrowserRouter>
         </SidebarContext.Provider>
     );

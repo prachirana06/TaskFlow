@@ -1,8 +1,10 @@
 
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../api";
 import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
+import QuickNav from "../components/QuickNav";
+import { Link } from "react-router-dom";
 import "./Analytics.css";
 
 function Analytics({ darkMode, setDarkMode }) {
@@ -14,22 +16,30 @@ function Analytics({ darkMode, setDarkMode }) {
         sessionStorage.getItem("token");
 
     useEffect(() => {
-        getTasks();
-    }, []);
+        let active = true;
 
-    const getTasks = async () => {
-        try {
-            const res = await axios.get("https://taskflow-backend-opjd.onrender.com/tasks", {
-                headers: {
-                    Authorization: `Bearer ${token}`
+        async function loadTasks() {
+            try {
+                const res = await api.get("/tasks", {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+
+                if (active) {
+                    setTasks(res.data);
                 }
-            });
-
-            setTasks(res.data);
-        } catch (error) {
-            console.log("Error fetching analytics:", error);
+            } catch (error) {
+                console.log("Error fetching analytics:", error);
+            }
         }
-    };
+
+        loadTasks();
+
+        return () => {
+            active = false;
+        };
+    }, [token]);
 
     // Task statistics
     const totalTasks = tasks.length;
@@ -74,7 +84,11 @@ function Analytics({ darkMode, setDarkMode }) {
     );
 
     const recentTasks = [...filteredTasks]
-        .sort((a, b) => b.id - a.id)
+        .sort(
+            (a, b) =>
+                new Date(b.createdAt || 0).getTime() -
+                new Date(a.createdAt || 0).getTime()
+        )
         .slice(0, 5);
 
     return (
@@ -99,6 +113,8 @@ function Analytics({ darkMode, setDarkMode }) {
                             Track your productivity and understand your progress.
                         </span>
                     </div>
+
+                    <QuickNav />
 
                     {/* Overview Cards */}
                     <div className="analytics-stats">
@@ -243,6 +259,9 @@ function Analytics({ darkMode, setDarkMode }) {
                             <div>
                                 <h2>Recent Tasks</h2>
                                 <p>Your latest added tasks</p>
+                                <Link className="quicknav-cta" to="/my-tasks">
+                                    View all tasks →
+                                </Link>
                             </div>
                             <span className="report-icon">☷</span>
                         </div>

@@ -290,6 +290,18 @@
     color: #c24d35;
 }
 
+.mytasks-actions .mytasks-done {
+    background: #187653;
+    border-color: #187653;
+    color: #fff;
+}
+
+.mytasks-actions .mytasks-done:hover {
+    background: #104734;
+    border-color: #104734;
+    color: #fff;
+}
+
 .mytasks-actions .mytasks-delete:hover {
     background: #fff0ec;
     border-color: #f0c5bb;

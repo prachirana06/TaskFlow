@@ -1,0 +1,73 @@
+:root {
+    --accent: #187653;
+}
+
+.welcome-section,
+.analytics-welcome,
+.calendar-welcome,
+.mytasks-welcome,
+.settings-welcome {
+    background: linear-gradient(120deg, #103d2e, var(--accent), var(--accent)) !important;
+}
+
+.add-task-btn,
+.mytasks-add,
+.task-actions .done-button,
+.mytasks-actions .mytasks-done,
+.settings-primary,
+.settings-switch input:checked + .settings-slider,
+.quicknav-active {
+    background: var(--accent) !important;
+    border-color: var(--accent) !important;
+    color: #fff !important;
+}
+
+.settings-primary:hover,
+.mytasks-add:hover,
+.add-task-btn:hover,
+.task-actions .done-button:hover,
+.mytasks-actions .mytasks-done:hover {
+    filter: brightness(0.92);
+}
+
+.app-error {
+    min-height: 100vh;
+    display: grid;
+    place-content: center;
+    text-align: center;
+    gap: 12px;
+    padding: 30px;
+    background: #f7f8f0;
+    color: #202b40;
+}
+
+.app-error h1 {
+    margin: 0;
+    font-size: 26px;
+}
+
+.app-error p {
+    margin: 0;
+    color: #788273;
+    font-size: 14px;
+}
+
+.navbar-avatar img,
+.dropdown-user-avatar img,
+.profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: inherit;
+}
+
+.app-error button {
+    justify-self: center;
+    padding: 11px 20px;
+    border: none;
+    border-radius: 10px;
+    background: var(--accent);
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+}

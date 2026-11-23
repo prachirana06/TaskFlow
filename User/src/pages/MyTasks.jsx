@@ -1,11 +1,26 @@
 
 import { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../api";
 import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
+import QuickNav from "../components/QuickNav";
+import { Link, useLocation } from "react-router-dom";
 import "./MyTasks.css";
 
+const API = "/tasks";
+
+async function fetchTasks(token) {
+    const response = await api.get(API, {
+        headers: { Authorization: `Bearer ${token}` }
+    });
+
+    return response.data;
+}
+
 function MyTasks({ darkMode, setDarkMode }) {
+    const location = useLocation();
+    const preselectedDate = location.state?.dueDate || "";
+
     const [tasks, setTasks] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -14,32 +29,22 @@ function MyTasks({ darkMode, setDarkMode }) {
     const [priorityFilter, setPriorityFilter] = useState("All");
     const [dateSort, setDateSort] = useState("none");
 
-    const [showForm, setShowForm] = useState(false);
+    const [showForm, setShowForm] = useState(Boolean(preselectedDate));
     const [editId, setEditId] = useState(null);
 
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [priority, setPriority] = useState("Medium");
     const [status, setStatus] = useState("Todo");
-    const [dueDate, setDueDate] = useState("");
+    const [dueDate, setDueDate] = useState(preselectedDate);
 
     const token =
         localStorage.getItem("token") ||
         sessionStorage.getItem("token");
 
-    const API = "https://taskflow-backend-opjd.onrender.com/tasks";
-
-    useEffect(() => {
-        getTasks();
-    }, []);
-
-    async function getTasks() {
+    async function refreshTasks() {
         try {
-            const response = await axios.get(API, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-
-            setTasks(response.data);
+            setTasks(await fetchTasks(token));
         } catch (error) {
             console.log(error);
             alert("Could not load tasks.");
@@ -47,6 +52,33 @@ function MyTasks({ darkMode, setDarkMode }) {
             setLoading(false);
         }
     }
+
+    useEffect(() => {
+        let active = true;
+
+        async function loadTasks() {
+            try {
+                const data = await fetchTasks(token);
+
+                if (active) {
+                    setTasks(data);
+                }
+            } catch (error) {
+                console.log(error);
+                alert("Could not load tasks.");
+            } finally {
+                if (active) {
+                    setLoading(false);
+                }
+            }
+        }
+
+        loadTasks();
+
+        return () => {
+            active = false;
+        };
+    }, [token]);
 
     function resetForm() {
         setTitle("");
@@ -80,12 +112,12 @@ function MyTasks({ darkMode, setDarkMode }) {
             };
 
             if (editId !== null) {
-                await axios.put(`${API}/${editId}`, taskData, config);
+                await api.put(`${API}/${editId}`, taskData, config);
             } else {
-                await axios.post(API, taskData, config);
+                await api.post(API, taskData, config);
             }
 
-            await getTasks();
+            await refreshTasks();
             resetForm();
         } catch (error) {
             console.log(error);
@@ -111,14 +143,38 @@ function MyTasks({ darkMode, setDarkMode }) {
         }
 
         try {
-            await axios.delete(`${API}/${task.id}`, {
+            await api.delete(`${API}/${task.id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
-            await getTasks();
+            await refreshTasks();
         } catch (error) {
             console.log(error);
             alert("Unable to delete task.");
+        }
+    }
+
+    async function toggleTaskStatus(task) {
+        const nextStatus =
+            task.status === "Completed" ? "Todo" : "Completed";
+
+        try {
+            await api.put(
+                `${API}/${task.id}`,
+                {
+                    title: task.title,
+                    description: task.description || "",
+                    priority: task.priority || "Medium",
+                    status: nextStatus,
+                    dueDate: task.dueDate || task.due_date || ""
+                },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+
+            await refreshTasks();
+        } catch (error) {
+            console.log(error);
+            alert("Unable to change task status.");
         }
     }
 
@@ -195,6 +251,8 @@ function MyTasks({ darkMode, setDarkMode }) {
                         <span>Organise your work and keep moving forward.</span>
                     </section>
 
+                    <QuickNav />
+
                     <section className="mytasks-stats">
                         {[
                             { name: "All", label: "Total Tasks" },
@@ -220,6 +278,9 @@ function MyTasks({ darkMode, setDarkMode }) {
                         <div>
                             <h2>All Tasks</h2>
                             <p>{filteredTasks.length} tasks found</p>
+                            <Link className="quicknav-cta" to="/calendar">
+                                See calendar →
+                            </Link>
                         </div>
 
                         <button
@@ -360,6 +421,16 @@ function MyTasks({ darkMode, setDarkMode }) {
                                     </div>
 
                                     <div className="mytasks-actions">
+                                        <button
+                                            type="button"
+                                            className="mytasks-done"
+                                            onClick={() => toggleTaskStatus(task)}
+                                        >
+                                            {task.status === "Completed"
+                                                ? "↺ Reopen"
+                                                : "✓ Done"}
+                                        </button>
+
                                         <button type="button" onClick={() => editTask(task)}>
                                             ✎ Edit
                                         </button>

@@ -1,8 +1,10 @@
 
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../api";
 import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
+import QuickNav from "../components/QuickNav";
+import { Link } from "react-router-dom";
 import "./Calendar.css";
 
 function Calendar({ darkMode, setDarkMode }) {
@@ -14,22 +16,30 @@ function Calendar({ darkMode, setDarkMode }) {
     const token = localStorage.getItem("token") || sessionStorage.getItem("token");
 
     useEffect(() => {
-        getTasks();
-    }, []);
+        let active = true;
 
-    const getTasks = async () => {
-        try {
-            const res = await axios.get("https://taskflow-backend-opjd.onrender.com/tasks", {
-                headers: {
-                    Authorization: `Bearer ${token}`
+        async function loadTasks() {
+            try {
+                const res = await api.get("/tasks", {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+
+                if (active) {
+                    setTasks(res.data);
                 }
-            });
-
-            setTasks(res.data);
-        } catch (error) {
-            console.log("Error fetching tasks:", error);
+            } catch (error) {
+                console.log("Error fetching tasks:", error);
+            }
         }
-    };
+
+        loadTasks();
+
+        return () => {
+            active = false;
+        };
+    }, [token]);
 
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
@@ -103,6 +113,8 @@ function Calendar({ darkMode, setDarkMode }) {
                         <h1>My Calendar 📅</h1>
                         <span>Keep track of your tasks and never miss a deadline.</span>
                     </div>
+
+                    <QuickNav />
 
                     <div className="calendar-layout">
 
@@ -193,6 +205,13 @@ function Calendar({ darkMode, setDarkMode }) {
                                 <span>
                                     {selectedTasks.length} tasks scheduled
                                 </span>
+                                <Link
+                                    className="quicknav-cta"
+                                    to="/my-tasks"
+                                    state={{ dueDate: formatDate(selectedDate) }}
+                                >
+                                    ＋ Add task for this day →
+                                </Link>
                             </div>
 
                             {selectedTasks.length > 0 ? (
