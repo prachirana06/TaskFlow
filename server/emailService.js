@@ -10,7 +10,7 @@ console.log("SMTP CHECK:", {
 
 const transporter = nodemailer.createTransport({
     host: "smtp-relay.brevo.com",
-    port: 587,
+    port: 2525,
     secure: false,
     auth: {
         user: process.env.SMTP_USER,
