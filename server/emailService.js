@@ -42,4 +42,8 @@ async function sendOtpEmail(email, otp, purpose = "verify your email") {
     });
 }
 
-module.exports = { sendOtpEmail };
+async function verifySmtpConnection() {
+    await transporter.verify();
+}
+
+module.exports = { sendOtpEmail, verifySmtpConnection };
