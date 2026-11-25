@@ -3,7 +3,7 @@ const express = require("express");
 
 //for otp api
 const crypto = require("crypto");
-const { sendOtpEmail, verifySmtpConnection } = require("./emailService");
+const { sendOtpEmail } = require("./emailService");
 
 const cors = require("cors");
 const mongoose = require("mongoose");
@@ -22,25 +22,6 @@ const app = express();
 
 app.use(cors());
 app.use(express.json({ limit: "3mb" }));
-
-app.get("/health/env", (req, res) => {
-    res.json({
-        mongoLoaded: !!process.env.MONGO_URI,
-        jwtLoaded: !!process.env.JWT_SECRET,
-        smtpUserLoaded: !!process.env.SMTP_USER,
-        smtpPassLoaded: !!process.env.SMTP_PASS,
-        emailUserLoaded: !!process.env.EMAIL_USER
-    });
-});
-
-app.get("/health/smtp", async (req, res) => {
-    try {
-        await verifySmtpConnection();
-        res.json({ ok: true });
-    } catch (error) {
-        res.status(500).json({ ok: false, message: error.message });
-    }
-});
 
 app.use((req, res, next) => {
     if (!req.body) {
